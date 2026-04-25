@@ -27,9 +27,9 @@ data/muestra_para_bautizar.csv
 data/embeddings.npy
 data/contratos_con_cluster.csv
 
+data/
 
 data/
 AutogluonModels/
 *.pkl
-*.npy
-*.parquet
+*.csv
