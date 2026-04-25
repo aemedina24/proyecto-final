@@ -1,0 +1,35 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments (Asegúrate de que tenga la barra /)
+.venv/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Archivos de configuración de VS Code
+.vscode/
+
+# Excluir el archivo pesado de la PC
+datos_contratacion.csv
+
+# Pero permitir que suba el comprimido
+!datos_secop.parquet
+
+#archivos que se generaron para el cluster
+data/objeto_contrato.csv
+data/muestra_para_bautizar.csv
+data/embeddings.npy
+data/contratos_con_cluster.csv
+
+
+data/
+AutogluonModels/
+*.pkl
+*.npy
+*.parquet
