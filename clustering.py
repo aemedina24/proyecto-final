@@ -39,7 +39,7 @@ ciudades = set(df_mun['Nombre Municipio'])
 #%%
 # 2. CONFIGURACIÓN DE LIMPIEZA
 # Corregido: Faltaba una coma antes de 'nueva basura'
-palabras_basura = [
+stop_words = [
     # --- Trámite y Legal ---
     'prestacion', 'servicios', 'apoyo', 'gestion', 'contrato', 'objeto', 
     'suscrito', 'celebrado', 'autonomia', 'independiente', 'caracter', 
@@ -58,33 +58,34 @@ palabras_basura = [
     'implementacion', 'ejecucion', 'seguimiento', 'coordinacion', 
     'relacionadas', 'proyectos', 'proyecto', 'apoyar', 'procesos', 
     'area', 'areas', 'acciones', 'administrativa',
-
-    # --- Jerarquía y Geografía ---
-    'alcaldia', 'gobernacion', 'nacional', 'distrital', 'local', 
-    'municipio', 'departamento', 'territorial'
 ]
+
+
 # Convertimos a set para que la búsqueda sea ultra rápida
 palabras_basura_set = set(palabras_basura)
 
 def limpieza_pro(texto):
-    if not texto or pd.isna(texto): return ""
-    texto = str(texto).lower().replace('\n', ' ')
-    texto = quitar_tildes(texto) 
-    texto = re.sub(r'\d+', '', texto) 
-    texto = re.sub(r'[^\w\s]', '', texto) 
+    if not texto or pd.isna(texto): 
+        return "missing"
+    
+    texto = str(texto).lower().replace('\n', ' ') #eliminca saltos de linea y pasa a minuscula
+    texto = quitar_tildes(texto) #quita tildes
+    texto = re.sub(r'\d+', '', texto) #eliminar numeros
+    texto = re.sub(r'[^\w\s]', '', texto) #elimina caracteres especiales
 
-    palabras = texto.split()
+    palabras = texto.split() #divide en palabras
     palabras_limpias = []
 
+        
     for p in palabras:
-        # IMPORTANTE: Eliminamos en lugar de reemplazar por "ciudad/departamento"
-        # para evitar que esas palabras actúen como "pegamento" en el centro del cluster.
-        if p in ciudades or p in departamentos:
-            continue 
+        if p in ciudades:
+            palabras_limpias.append("ciudad")
+        elif p in departamentos:
+            palabras_limpias.append("departamento")
         elif p not in palabras_basura_set and len(p) > 3:
             palabras_limpias.append(p)
 
-    return " ".join(palabras_limpias)
+    return " ".join(palabras_limpias) if palabras_limpias else "missing"
 
 
 
