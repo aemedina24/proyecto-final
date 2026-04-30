@@ -1,95 +1,5 @@
 
 #%%
-import pandas as pd
-from sentence_transformers import SentenceTransformer
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score, silhouette_samples
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-import unicodedata
-import re
-from sklearn.preprocessing import normalize
-
-
-
-#%%
-# 1. CARGA DE GEOGRAFÍA
-df_mun = pd.read_csv('data/municipios.csv')
-df_dep = pd.read_csv('data/departamentos.csv')
-df_mun['Nombre Municipio'] = df_mun['Nombre Municipio'].str.lower()
-df_dep['Nombre Departamento'] = df_dep['Nombre Departamento'].str.lower()
-
-def quitar_tildes(texto):
-    if not isinstance(texto, str): return ""
-    return ''.join(
-        c for c in unicodedata.normalize('NFD', texto)
-        if unicodedata.category(c) != 'Mn'
-    )
-# Limpieza de diccionarios geográficos
-df_mun['Nombre Municipio'] = df_mun['Nombre Municipio'].str.lower().apply(quitar_tildes)
-df_dep['Nombre Departamento'] = df_dep['Nombre Departamento'].str.lower().apply(quitar_tildes)
-
-#CREAR SETS
-departamentos = set(df_dep['Nombre Departamento'])
-ciudades = set(df_mun['Nombre Municipio'])
-
-#%%
-# 2. CONFIGURACIÓN DE LIMPIEZA
-# Corregido: Faltaba una coma antes de 'nueva basura'
-stop_words = [
-    # --- Trámite y Legal ---
-    'prestacion', 'servicios', 'apoyo', 'gestion', 'contrato', 'objeto', 
-    'suscrito', 'celebrado', 'autonomia', 'independiente', 'caracter', 
-    'temporal', 'manera', 'vinculo', 'laboral', 'cuenta', 'riesgo',
-    'para', 'prestar', 'como', 'contratista', 'mediante', 'dentro', 
-    'caso', 'forma', 'parte', 'clase', 'proceso', 'mismo', 'cada', 
-    'fin', 'base', 'cuanto', 'entidad', 'vigencia', 'anualidad',
-    'realizar', 'ejecutar', 'orientado', 'consistente', 'favor', 
-    'marco', 'desarrollo', 'contratar', 'acuerdo', 'asignadas',
-
-    # --- Relleno Administrativo (Las que ensucian tus clusters) ---
-    'aunar', 'esfuerzos', 'tecnicos', 'administrativos', 'financieros', 
-    'fortalecimiento', 'mejoramiento', 'desarrollar', 'implementar',
-    'tecnico', 'profesional', 'profesionales', 'actividades', 'integral', 
-    'especializado', 'administrativo', 'operativo', 'asistencial', 
-    'implementacion', 'ejecucion', 'seguimiento', 'coordinacion', 
-    'relacionadas', 'proyectos', 'proyecto', 'apoyar', 'procesos', 
-    'area', 'areas', 'acciones', 'administrativa',
-]
-
-
-# Convertimos a set para que la búsqueda sea ultra rápida
-palabras_basura_set = set(palabras_basura)
-
-def limpieza_pro(texto):
-    if not texto or pd.isna(texto): 
-        return "missing"
-    
-    texto = str(texto).lower().replace('\n', ' ') #eliminca saltos de linea y pasa a minuscula
-    texto = quitar_tildes(texto) #quita tildes
-    texto = re.sub(r'\d+', '', texto) #eliminar numeros
-    texto = re.sub(r'[^\w\s]', '', texto) #elimina caracteres especiales
-
-    palabras = texto.split() #divide en palabras
-    palabras_limpias = []
-
-        
-    for p in palabras:
-        if p in ciudades:
-            palabras_limpias.append("ciudad")
-        elif p in departamentos:
-            palabras_limpias.append("departamento")
-        elif p not in palabras_basura_set and len(p) > 3:
-            palabras_limpias.append(p)
-
-    return " ".join(palabras_limpias) if palabras_limpias else "missing"
-
-
-
-#%%
 # 3. PROCESAMIENTO
 df = pd.read_csv('data/objeto_contratos.csv')
 df['texto_limpio'] = df['objeto_del_proceso'].apply(limpieza_pro)
@@ -106,7 +16,7 @@ embeddings_norm = normalize(embeddings)
 
 #%%
 # 6 Guardar arachivo
-np.save('data/embeddings_norm.npy', embeddings_norm)
+np.save('data/embeddings_norm.csv', embeddings_norm)
 
 #%%
 
