@@ -25,8 +25,9 @@ def limpieza_total(texto):
             .decode('utf-8')
     
     #quitar parentesis y corchetes
-    texto = re.sub(r'\(.*?\)|\[.*?\]', '', texto)
-    
+   
+    texto = re.sub(r'[\(\)\[\]\*]', '', texto)
+
     # reemplazar separadores
     texto = re.sub(r'[-\t\n\r]', ' ', texto)
          
